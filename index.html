@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>Rachel资源库</title>
+
+<style>
+:root {
+    --bg-main: #eef2f7;
+    --bg-card: #ffffff;
+    --blue-main: #3498db;
+    --blue-dark: #2980b9;
+    --green-main: #2ecc71;
+    --text-main: #333;
+    --text-sub: #666;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Segoe UI", sans-serif;
+}
+
+body {
+    background: var(--bg-main);
+    min-height: 100vh;
+}
+
+/* ===== 登录界面 ===== */
+.login-screen {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+.login-box {
+    background: var(--bg-card);
+    padding: 35px;
+    border-radius: 12px;
+    width: 340px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+    text-align: center;
+}
+
+.login-box h2 {
+    margin-bottom: 25px;
+    font-size: 28px;
+}
+
+.login-box input {
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 18px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    font-size: 15px;
+}
+
+.login-box button {
+    width: 100%;
+    padding: 12px;
+    background: linear-gradient(135deg, var(--blue-main), var(--blue-dark));
+    border: none;
+    color: #fff;
+    font-size: 16px;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+/* ===== 主界面 ===== */
+.main-screen {
+    display: none;
+}
+
+header {
+    background: var(--bg-card);
+    padding: 40px 20px;
+    text-align: center;
+    border-radius: 0 0 12px 12px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+}
+
+header h1 {
+    font-size: 36px;
+    margin-bottom: 10px;
+}
+
+header p {
+    color: var(--text-sub);
+}
+
+.container {
+    width: 90%;
+    max-width: 1100px;
+    margin: 30px auto;
+}
+
+.stats {
+    display: flex;
+    gap: 20px;
+    margin-bottom: 25px;
+}
+
+.stat-card {
+    background: var(--bg-card);
+    padding: 25px;
+    border-radius: 10px;
+    flex: 1;
+    text-align: center;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+}
+
+.stat-card h3 {
+    font-size: 15px;
+    color: var(--text-sub);
+}
+
+.stat-number {
+    font-size: 36px;
+    font-weight: bold;
+    color: var(--blue-main);
+}
+
+.resource-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 20px;
+}
+
+.resource-card {
+    background: var(--bg-card);
+    border-radius: 10px;
+    padding: 18px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+}
+
+.resource-card h4 {
+    font-size: 16px;
+    margin-bottom: 8px;
+    word-break: break-all;
+}
+
+.resource-card p {
+    font-size: 13px;
+    color: #888;
+    margin-bottom: 12px;
+}
+
+a.download {
+    display: inline-block;
+    padding: 10px 18px;
+    background: linear-gradient(135deg, var(--green-main), #27ae60);
+    color: #fff;
+    border-radius: 6px;
+    text-decoration: none;
+}
+
+.admin-tag {
+    display: inline-block;
+    background: #ffeaa7;
+    color: #d35400;
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 14px;
+    margin-top: 15px;
+}
+
+footer {
+    text-align: center;
+    padding: 25px;
+    color: var(--text-sub);
+    font-size: 14px;
+    margin-top: 50px;
+}
+</style>
+</head>
+
+<body>
+
+<!-- ===== 登录界面 ===== -->
+<div id="loginScreen" class="login-screen">
+    <div class="login-box">
+        <h2>Rachel资源库</h2>
+        <input id="username" placeholder="请输入用户名">
+        <button onclick="login()">登 录</button>
+    </div>
+</div>
+
+<!-- ===== 主界面 ===== -->
+<div id="mainScreen" class="main-screen">
+
+    <header>
+        <h1>Rachel资源库</h1>
+        <p>学习资源集中地 · 静态 PDF 下载站</p>
+        <div id="adminTag" class="admin-tag" style="display:none;">
+            👑 DRQ 管理员已登录
+        </div>
+    </header>
+
+    <div class="container">
+
+        <div class="stats">
+            <div class="stat-card">
+                <h3>已上传 PDF 数量</h3>
+                <div id="pdfCount" class="stat-number">0</div>
+            </div>
+            <div class="stat-card">
+                <h3>最大容量</h3>
+                <div class="stat-number">10,000</div>
+            </div>
+        </div>
+
+        <div id="resourceList" class="resource-list"></div>
+
+    </div>
+
+    <footer>
+        © Rachel资源库 · 版权归 deng-r-qi 所有
+    </footer>
+
+</div>
+
+<script>
+/* ===== 登录逻辑 ===== */
+function login() {
+    const user = document.getElementById("username").value.trim();
+    if (!user) {
+        alert("请输入用户名");
+        return;
+    }
+    localStorage.setItem("rachel_user", user);
+    showMain(user);
+}
+
+function showMain(user) {
+    document.getElementById("loginScreen").style.display = "none";
+    document.getElementById("mainScreen").style.display = "block";
+
+    if (user === "DRQ") {
+        document.getElementById("adminTag").style.display = "inline-block";
+    }
+
+    loadPDFs();
+}
+
+/* ===== PDF 自动扫描 ===== */
+async function loadPDFs() {
+    try {
+        const res = await fetch("pdf/");
+        const text = await res.text();
+
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(text, "text/html");
+        const links = Array.from(doc.querySelectorAll("a"));
+
+        const pdfs = links
+            .map(a => a.getAttribute("href"))
+            .filter(href => href && href.endsWith(".pdf"));
+
+        const listEl = document.getElementById("resourceList");
+        const countEl = document.getElementById("pdfCount");
+
+        listEl.innerHTML = "";
+        countEl.textContent = pdfs.length;
+
+        if (pdfs.length === 0) {
+            listEl.innerHTML = `<p style="color:#888;">暂无 PDF 资源</p>`;
+            return;
+        }
+
+        pdfs.forEach(pdf => {
+            const card = document.createElement("div");
+            card.className = "resource-card";
+            card.innerHTML = `
+                <h4>${pdf.split("/").pop()}</h4>
+                <a class="download" href="pdf/${pdf}" download>⬇ 下载 PDF</a>
+            `;
+            listEl.appendChild(card);
+        });
+
+    } catch (e) {
+        console.error(e);
+    }
+}
+
+/* ===== 页面加载检查登录 ===== */
+const savedUser = localStorage.getItem("rachel_user");
+if (savedUser) {
+    showMain(savedUser);
+}
+</script>
+
+</body>
+</html>
